@@ -1,13 +1,18 @@
-const CardService = require('../services/CardService');
+const CardService = require('../services/CardService'); 
 
 class CardController {
   async validateDeck(req, res) {
     try {
-      const cards = req.body;
-      // const result = await CardService.validateDeck(cards);
-      res.send(result);
+      if (!req.body || !req.body.cards) {
+        return res.status(400).json({ error: 'Missing request body or "cards" array.' });
+      }
+      const cards = req.body.cards;
+      const cardService = new CardService();
+      const result = await cardService.validateDeck(cards);
+      return res.status(200).json({ invalidCards: result });
     } catch (error) {
-      res.status(500).send({ message: 'Internal Server Error' });
+      console.error('Validation error:', error);
+      return res.status(500).json({ message: 'Internal Server Error' });
     }
   }
 }
